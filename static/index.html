@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WME Virtualization Manager</title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="sidebar-header">
+<h1><i class="fas fa-cloud"></i> WME</h1>
+<span>Virtualization Manager</span>
+</div>
+<nav class="sidebar-nav">
+<a href="#" class="nav-item active" data-page="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+<a href="#" class="nav-item" data-page="vms"><i class="fas fa-server"></i> Virtual Machines</a>
+<a href="#" class="nav-item" data-page="storage"><i class="fas fa-database"></i> Storage</a>
+<a href="#" class="nav-item" data-page="networks"><i class="fas fa-network-wired"></i> Networks</a>
+</nav>
+<div class="sidebar-footer">
+<div class="host-status">
+<div class="status-dot" id="hostStatusDot"></div>
+<span id="hostStatusText">Checking...</span>
+</div>
+</div>
+</aside>
+<main class="main-content">
+<header class="topbar">
+<div class="topbar-title">
+<h2 id="pageTitle">Dashboard</h2>
+<button class="btn btn-primary" id="createVmBtn"><i class="fas fa-plus"></i> Create VM</button>
+</div>
+<div class="topbar-right">
+<span id="clock"></span>
+</div>
+</header>
+<section class="page active" id="page-dashboard">
+<div class="stats-grid">
+<div class="stat-card">
+<div class="stat-icon cpu"><i class="fas fa-microchip"></i></div>
+<div class="stat-info">
+<h3>CPU Usage</h3>
+<p id="hostCpu">0%</p>
+<div class="progress-bar"><div class="progress-fill cpu-fill" id="hostCpuBar" style="width:0%"></div></div>
+</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon memory"><i class="fas fa-memory"></i></div>
+<div class="stat-info">
+<h3>Memory Usage</h3>
+<p id="hostMem">0 / 0</p>
+<div class="progress-bar"><div class="progress-fill memory-fill" id="hostMemBar" style="width:0%"></div></div>
+</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon disk"><i class="fas fa-hdd"></i></div>
+<div class="stat-info">
+<h3>Disk Usage</h3>
+<p id="hostDisk">0 / 0</p>
+<div class="progress-bar"><div class="progress-fill disk-fill" id="hostDiskBar" style="width:0%"></div></div>
+</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon network"><i class="fas fa-network-wired"></i></div>
+<div class="stat-info">
+<h3>Network</h3>
+<p id="hostNet">↓ 0 B/s ↑ 0 B/s</p>
+<div class="net-detail">
+<span id="hostNetTotal">Total: 0 B / 0 B</span>
+</div>
+</div>
+</div>
+</div>
+<div class="cards-row">
+<div class="card">
+<div class="card-header">
+<h3><i class="fas fa-server"></i> Host Information</h3>
+</div>
+<div class="host-info-grid" id="hostInfoGrid">
+<div class="info-item">
+<div class="label">Loading...</div>
+<div class="value">-</div>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-header">
+<h3><i class="fas fa-database"></i> Storage Summary</h3>
+<span class="storage-total" id="storageTotal">Loading...</span>
+</div>
+<div class="storage-summary-list" id="storageSummaryList">
+<div class="empty-state">Loading storage...</div>
+</div>
+</div>
+</div>
+<div class="cards-row">
+<div class="card card-wide">
+<div class="card-header">
+<h3><i class="fas fa-chart-line"></i> Host Performance Overview</h3>
+</div>
+<div class="chart-container">
+<canvas id="hostPerfChart"></canvas>
+</div>
+</div>
+</div>
+<div class="cards-row">
+<div class="card card-wide">
+<div class="card-header">
+<h3><i class="fas fa-server"></i> Virtual Machines</h3>
+<span class="vm-count" id="vmCount">0 VMs</span>
+</div>
+<div class="vm-overview-list" id="vmOverviewList">
+<div class="empty-state">No VMs found. Click "Create VM" to get started.</div>
+</div>
+</div>
+</div>
+</section>
+<section class="page" id="page-vms">
+<div class="card">
+<div class="card-header">
+<h3><i class="fas fa-server"></i> Virtual Machines</h3>
+<div class="card-actions">
+<button class="btn btn-secondary" id="refreshVmsBtn"><i class="fas fa-sync"></i> Refresh</button>
+</div>
+</div>
+<div class="table-container">
+<table class="data-table" id="vmsTable">
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>State</th>
+<th>IP Address</th>
+<th>CPU</th>
+<th>Memory</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="vmsTableBody">
+<tr><td colspan="7" class="text-center">Loading...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section class="page" id="page-storage">
+<div class="card">
+<div class="card-header">
+<h3><i class="fas fa-database"></i> Storage Pools</h3>
+</div>
+<div class="table-container">
+<table class="data-table" id="storageTable">
+<thead>
+<tr>
+<th>Name</th>
+<th>State</th>
+<th>Capacity</th>
+<th>Allocation</th>
+<th>Available</th>
+</tr>
+</thead>
+<tbody id="storageTableBody">
+<tr><td colspan="5" class="text-center">Loading...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section class="page" id="page-networks">
+<div class="card">
+<div class="card-header">
+<h3><i class="fas fa-network-wired"></i> Networks</h3>
+</div>
+<div class="table-container">
+<table class="data-table" id="networksTable">
+<thead>
+<tr>
+<th>Name</th>
+<th>State</th>
+<th>Bridge</th>
+<th>Forward</th>
+</tr>
+</thead>
+<tbody id="networksTableBody">
+<tr><td colspan="4" class="text-center">Loading...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section class="page" id="page-vm-detail">
+<div class="detail-header">
+<button class="btn btn-secondary" id="backToVmsBtn"><i class="fas fa-arrow-left"></i> Back</button>
+<h2 id="vmDetailName">VM Detail</h2>
+<div class="detail-actions" id="vmDetailActions"></div>
+</div>
+<div class="cards-row">
+<div class="card">
+<div class="card-header"><h3><i class="fas fa-info-circle"></i> Overview</h3></div>
+<div class="info-grid" id="vmInfoGrid"></div>
+</div>
+<div class="card">
+<div class="card-header"><h3><i class="fas fa-chart-bar"></i> Performance</h3></div>
+<div class="chart-container">
+<canvas id="vmPerfChart"></canvas>
+</div>
+</div>
+</div>
+<div class="cards-row">
+<div class="card">
+<div class="card-header"><h3><i class="fas fa-hdd"></i> Disks</h3></div>
+<div class="table-container">
+<table class="data-table">
+<thead><tr><th>Device</th><th>Target</th><th>Source</th></tr></thead>
+<tbody id="vmDisksBody"></tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<div class="card-header"><h3><i class="fas fa-network-wired"></i> Network Interfaces</h3></div>
+<div class="table-container">
+<table class="data-table">
+<thead><tr><th>Type</th><th>MAC</th><th>Source</th><th>Model</th></tr></thead>
+<tbody id="vmNicsBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+<div class="modal-overlay" id="createVmModal">
+<div class="modal">
+<div class="modal-header">
+<h3><i class="fas fa-plus-circle"></i> Create Virtual Machine</h3>
+<button class="modal-close" id="closeModalBtn">&times;</button>
+</div>
+<div class="modal-body">
+<div class="wizard">
+<div class="wizard-steps">
+<div class="wizard-step active" data-step="1"><span>1</span> General</div>
+<div class="wizard-step" data-step="2"><span>2</span> Resources</div>
+<div class="wizard-step" data-step="3"><span>3</span> Storage & Network</div>
+<div class="wizard-step" data-step="4"><span>4</span> Confirm</div>
+</div>
+<form id="createVmForm">
+<div class="wizard-panel active" data-panel="1">
+<div class="form-group">
+<label for="vmName">VM Name</label>
+<input type="text" id="vmName" class="form-input" placeholder="e.g. my-server" required>
+</div>
+<div class="form-group">
+<label for="vmOS">Operating System</label>
+<select id="vmOS" class="form-input">
+<option value="linux">Linux</option>
+<option value="ubuntu">Ubuntu</option>
+<option value="debian">Debian</option>
+<option value="centos">CentOS</option>
+<option value="alpine">Alpine</option>
+</select>
+</div>
+<div class="form-group">
+<label for="vmPassword">Root Password</label>
+<input type="text" id="vmPassword" class="form-input" placeholder="Enter root password" value="root123">
+</div>
+<div class="form-group">
+<label for="vmDescription">Description</label>
+<textarea id="vmDescription" class="form-input" rows="3" placeholder="Optional description"></textarea>
+</div>
+</div>
+<div class="wizard-panel" data-panel="2">
+<div class="form-group">
+<label for="vmCores">CPU Cores</label>
+<input type="number" id="vmCores" class="form-input" value="2" min="1" max="64" required>
+</div>
+<div class="form-group">
+<label for="vmMemory">Memory (MB)</label>
+<input type="number" id="vmMemory" class="form-input" value="2048" min="128" max="65536" step="128" required>
+</div>
+<div class="form-group">
+<label for="vmDisk">Disk Size (GB)</label>
+<input type="number" id="vmDisk" class="form-input" value="20" min="1" max="2048" required>
+</div>
+</div>
+<div class="wizard-panel" data-panel="3">
+<div class="form-group">
+<label for="vmNetwork">Network</label>
+<select id="vmNetwork" class="form-input">
+<option value="br0">br0</option>
+</select>
+</div>
+<div class="form-group">
+<label for="vmISO">Installation ISO</label>
+<select id="vmISO" class="form-input">
+<option value="">No ISO (boot from disk)</option>
+</select>
+</div>
+<div class="upload-zone" id="isoUploadZone">
+<i class="fas fa-cloud-upload-alt"></i>
+<p><strong>Upload ISO</strong> or drag & drop here</p>
+<p class="text-muted">.iso files only</p>
+<input type="file" id="isoFileInput" accept=".iso" style="display:none">
+<div class="upload-progress hidden" id="isoUploadProgress">
+<div class="upload-progress-bar">
+<div class="upload-progress-fill" id="isoUploadProgressBar" style="width:0%"></div>
+</div>
+<p class="text-muted" id="isoUploadStatus">Uploading...</p>
+</div>
+</div>
+<div class="form-group">
+<label for="vmStorage">Storage Pool</label>
+<select id="vmStorage" class="form-input">
+<option value="default">default</option>
+</select>
+</div>
+<div class="form-group checkbox-group">
+<label class="checkbox-label">
+<input type="checkbox" id="vmStartOnCreate" checked>
+<span>Start VM after creation</span>
+</label>
+</div>
+</div>
+<div class="wizard-panel" data-panel="4">
+<div class="confirm-summary" id="createVmSummary"></div>
+</div>
+</form>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" id="wizardPrevBtn" disabled><i class="fas fa-arrow-left"></i> Previous</button>
+<button class="btn btn-primary" id="wizardNextBtn">Next <i class="fas fa-arrow-right"></i></button>
+<button class="btn btn-success hidden" id="wizardCreateBtn"><i class="fas fa-check"></i> Create VM</button>
+</div>
+</div>
+</div>
+<div class="modal-overlay" id="confirmModal">
+<div class="modal modal-sm">
+<div class="modal-header">
+<h3 id="confirmTitle">Confirm</h3>
+<button class="modal-close" id="confirmCloseBtn">&times;</button>
+</div>
+<div class="modal-body">
+<p id="confirmMessage"></p>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" id="confirmCancelBtn">Cancel</button>
+<button class="btn btn-danger" id="confirmOkBtn">Confirm</button>
+</div>
+</div>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
